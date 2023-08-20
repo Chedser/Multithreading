@@ -1,0 +1,35 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <stdlib.h>
+
+using namespace std;
+
+void DoWork() {
+    for (int i = 0; i < 10; i++) {
+        cout << "Идентификатор потока: " << this_thread::get_id() << " DoWork " << (i + 1) << endl;
+        this_thread::sleep_for(chrono::microseconds(1000));
+    }
+}
+
+int main(){
+    setlocale(LC_ALL, "ru");
+    
+    cout << "START MAIN" << endl;
+
+    std::thread t{ DoWork };
+    std::thread t2{ DoWork };
+    //t.detach(); Если отрабатывает main, то поток t завершается
+   // t.join(); // Последовательное выполнение, но в разных потоках. Если main завершается, то поток t не завершается
+  
+    for (int i = 0; i < 10; i++) {
+        cout << "Идентификатор потока: " << this_thread::get_id() << " main " << (i + 1) << endl;
+        this_thread::sleep_for(chrono::microseconds(500));
+    }
+
+    t.join(); // Параллельное выполнение. Если main завершается, то поток t не завершается
+    t2.join();
+    cout << "END MAIN" << endl;
+    
+    return 0;
+}
