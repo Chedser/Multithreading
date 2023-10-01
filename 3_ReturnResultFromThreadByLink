@@ -1,1 +1,32 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <stdlib.h>
 
+using namespace std;
+
+void DoWork(int& a) {
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    cout << "ID потока:" << this_thread::get_id() << "\tDoWork started\t" << endl;
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        a *= 2;
+        cout << "ID потока:" << this_thread::get_id() << "\tDoWork stopped\t" << endl;
+}
+
+int main() {
+    setlocale(LC_ALL, "ru");
+
+    int q = 5;
+    thread t(DoWork,std::ref(q));
+
+    for (size_t i = 0; i < 10; i++) { // Может начаться раньше
+        cout << "ID потока:" << this_thread::get_id() << "\tmain works\t" << (i + 1) << endl;
+        this_thread::sleep_for(chrono::milliseconds(500));
+    }
+
+    t.join();
+   // t.detach(); DoWork не успеет выполниться
+    cout << q << endl;
+
+    return 0;
+}
